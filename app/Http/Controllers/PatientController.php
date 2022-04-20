@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use Exception;
 use Carbon\Carbon;
+use App\Models\Doctor;
 use App\Models\Patient;
+use App\Models\Appointment;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -46,7 +49,15 @@ class PatientController extends Controller
 			->leftJoin('districts', 'districts.id', '=', 'address_info.subdistrict_id')
 			->first(['*', 'districts.name_th AS subdistrict_name', 'amphures.name_th AS district_name', 'provinces.name_th AS province_name']);
 
-		return view('admin.patient.patient_detail', compact(['patient', 'provinces', 'patient_group', 'patient_emc']));
+		$appointments = Appointment::where('appointments.patient_id', $id)
+			->leftJoin('patients', 'patients.patient_id', '=', 'appointments.patient_id')
+			->leftJoin('doctors', 'doctors.doctor_id', '=', 'appointments.doctor_id')
+			->orderBy('appointments.appointment_id', 'desc')
+			->get(['appointments.*', 'appointments.reason_for_appointment AS title', 'doctors.title AS doctor_title', 'doctors.fname AS doctor_fname', 'doctors.lname AS doctor_lname', 'patients.title AS patient_title', 'patients.fname AS patient_fname', 'patients.lname AS patient_lname']);
+
+		$doctors = Doctor::where('doctor_status', '1')->get();
+
+		return view('admin.patient.patient_detail', compact(['patient', 'provinces', 'patient_group', 'patient_emc', 'doctors', 'appointments']));
 	}
 
 	public function create()
@@ -63,13 +74,35 @@ class PatientController extends Controller
 		// Validation Main Patient
 		$validator = Validator::make($req->all(), [
 			'id_card' => 'required|max:17|min:13',
-			'group_id' => 'required',
-			'fname' => 'required',
-			'lname' => 'required',
-			'sex' => 'required',
-			'birthdate' => 'required',
-			'age' => 'min:0|max:3',
-			'phone' => 'required|max:13|min:9'
+			'group_id' => 'required|numeric|min:0|max:20',
+			'title' => 'required',
+			'fname' => 'required|min:0|max:100|string',
+			'lname' => 'required|min:0|max:255|string',
+			'nname' => 'nullable|max:50',
+			'sex' => 'required|max:6',
+			'birthdate' => 'required|date|min:0|max:100',
+			'age' => 'required|numeric|min:1|max:120',
+			'nationality' => 'nullable|string|max:50',
+			'race' => 'nullable|string|max:50',
+			'religion' => 'nullable|string|max:50',
+			'email' => 'nullable|email|unique:patients|max:255|',
+			'id_line' => 'nullable|max:100|unique:patients',
+			'phone' => 'required|max:13|min:9',
+			'occupation' => 'nullable|string|max:50',
+			'image' => 'nullable|mimes:jpg,png,gif,jpeg',
+			//address_info
+			'zip_code' => 'nullable|string|max:10',
+			'country' => 'nullable|string|max:40',
+
+			// Patient_medical_info
+			'height' => 'nullable|numeric|min:0|max:250',
+			'weight' => 'nullable|numeric|min:0|max:500',
+
+			// Patient_emc
+			'emc_fname' => 'nullable|min:0|max:100|string',
+			'emc_lname' => 'nullable|min:0|max:255|string',
+			'emc_phone' => 'nullable|min:9|max:13',
+			'emc_country' => 'nullable|string|max:40'
 		]);
 
 		if ($validator->fails()) {
@@ -82,16 +115,14 @@ class PatientController extends Controller
 		DB::beginTransaction();
 		try {
 			// Create Address info
-			if ($req->address || $req->subdistrict_id || $req->district_id || $req->province_id || $req->zip_code || $req->country != null) {
-				$address_info = DB::table('address_info')->insertGetId([
-					'address' => $req->address,
-					'subdistrict_id' => $req->subdistrict_id,
-					'district_id' => $req->district_id,
-					'province_id' => $req->province_id,
-					'zip_code' => $req->zip_code,
-					'country' => $req->country
-				]);
-			}
+			$address_info = DB::table('address_info')->insertGetId([
+				'address' => $req->address,
+				'subdistrict_id' => $req->subdistrict_id,
+				'district_id' => $req->district_id,
+				'province_id' => $req->province_id,
+				'zip_code' => $req->zip_code,
+				'country' => $req->country
+			]);
 
 			// Image Process
 			// Rename Image
@@ -160,21 +191,17 @@ class PatientController extends Controller
 			]);
 
 			// Validation  Patient Emc
-			if ($req->emc_address || $req->emc_subdistrict_id || $req->emc_district_id || $req->emc_province_id || $req->emc_zip_code || $req->emc_country != null) {
-				$address_info_emc = DB::table('address_info')->insertGetId([
-					'address' => $req->emc_address,
-					'subdistrict_id' => $req->emc_subdistrict_id,
-					'district_id' => $req->emc_district_id,
-					'province_id' => $req->emc_province_id,
-					'zip_code' => $req->emc_zip_code,
-					'country' => $req->emc_country
-				]);
-			} else {
-				$address_info_emc = null;
-			}
+			$address_info_emc = DB::table('address_info')->insertGetId([
+				'address' => $req->emc_address,
+				'subdistrict_id' => $req->emc_subdistrict_id,
+				'district_id' => $req->emc_district_id,
+				'province_id' => $req->emc_province_id,
+				'zip_code' => $req->emc_zip_code,
+				'country' => $req->emc_country
+			]);
 
 			//8. Create Patient emc
-			$patient_medical_info = DB::table('patient_emc')->insert([
+			$patient_emc = DB::table('patient_emc')->insert([
 				'patient_id' => $patient->patient_id,
 				'emc_relation' => $req->emc_relation,
 				'emc_title' => $req->emc_title,
@@ -221,12 +248,34 @@ class PatientController extends Controller
 		$validator = Validator::make($req->all(), [
 			'id_card' => 'required|max:17|min:13',
 			'group_id' => 'required',
-			'fname' => 'required',
-			'lname' => 'required',
+			'title' => 'required',
+			'fname' => 'required|min:0|max:100|string',
+			'lname' => 'required|min:0|max:255|string',
+			'nname' => 'nullable|max:50',
 			'sex' => 'required',
-			'birthdate' => 'required',
-			'age' => 'min:0|max:3',
-			'phone' => 'required|max:13|min:9'
+			'birthdate' => 'required|date|min:0|max:100',
+			'age' => 'required|numeric|min:1|max:120',
+			'nationality' => 'nullable|string|max:50',
+			'race' => 'nullable|string|max:50',
+			'religion' => 'nullable|string|max:50',
+			'email' => 'nullable|email|max:255|' . Rule::unique('patients')->ignore($req->patient_id, 'patient_id'),
+			'id_line' => 'nullable|max:100|' . Rule::unique('patients')->ignore($req->patient_id, 'patient_id'),
+			'phone' => 'required|max:13|min:9',
+			'occupation' => 'nullable|string|max:50',
+			'image' => 'nullable|mimes:jpg,png,gif,jpeg',
+			//address_info
+			'zip_code' => 'nullable|string|max:10',
+			'country' => 'nullable|string|max:40',
+
+			// Patient_medical_info
+			'height' => 'nullable|numeric|min:0|max:250',
+			'weight' => 'nullable|numeric|min:0|max:500',
+
+			// Patient_emc
+			'emc_fname' => 'nullable|min:0|max:100|string',
+			'emc_lname' => 'nullable|min:0|max:255|string',
+			'emc_phone' => 'nullable|min:9|max:13',
+			'emc_country' => 'nullable|string|max:40'
 		]);
 
 		if ($validator->fails()) {
@@ -264,7 +313,7 @@ class PatientController extends Controller
 				$path = 'image/uploads/';
 				$patient_image->move($path, $image);
 				if ($req->old_image !== 'default_profile.png' && $req->old_image != '' && $req->old_image != null) {
-					unlink(public_path('image\\uploads\\patient\\' . $req->old_image));
+					unlink(public_path('image\\uploads\\' . $req->old_image));
 				}
 			} else {
 				$image = $req->old_image;
@@ -320,7 +369,7 @@ class PatientController extends Controller
 				]);
 
 			// Validation  Patient Emc
-			if ($req->emc_address || $req->emc_subdistrict_id || $req->emc_district_id || $req->emc_province_id || $req->emc_zip_code || $req->emc_country != null) {
+			if ($req->emc_address || $req->emc_subdistrict_id || $req->emc_district_id || $req->emc_province_id || $req->emc_zip_code || $req->emc_country !== null) {
 				$address_info_emc = DB::table('address_info')
 					->where('address_id', $req->emc_address_id)
 					->update([
@@ -331,12 +380,11 @@ class PatientController extends Controller
 						'zip_code' => $req->emc_zip_code,
 						'country' => $req->emc_country
 					]);
-			} else {
-				$address_info_emc = null;
 			}
 
+
 			//8. Create Patient emc
-			$patient_medical_info = DB::table('patient_emc')
+			$patient_emc = DB::table('patient_emc')
 				->where('patient_emc_id', $req->patient_emc_id)
 				->update([
 					'patient_id' => $req->patient_id,
@@ -377,7 +425,7 @@ class PatientController extends Controller
 			$logs_user = DB::table('logs_user')->insert([
 				'user_id' => Auth::user()->user_id,
 				'activity' => 'Fail! Update Info Patient',
-				'logs_detail' => 'something is wrong',
+				'logs_detail' => 'something is wrong' . $e->getMessage(),
 				'logs_status' => 'fail'
 			]);
 			DB::commit();
@@ -400,7 +448,7 @@ class PatientController extends Controller
 			$patient = Patient::where('patient_id', $req->patient_id)->delete();
 
 			if ($get_id->image !== 'default_profile.png' && $get_id->image != '' && $get_id->image != null) {
-				$remove = unlink(public_path('image\\uploads\\patient\\' . $get_id->image));
+				$remove = unlink(public_path('image\\uploads\\' . $get_id->image));
 			}
 
 			// Create patient_medical_info
@@ -410,13 +458,13 @@ class PatientController extends Controller
 
 			// Validation  Patient Emc
 			if ($get_emc_address_id->emc_address_id) {
-				$address_info_emc = DB::table('address_info')
+				$address_info = DB::table('address_info')
 					->where('address_id', $get_emc_address_id->emc_address_id)
 					->delete();
 			}
 
 			//8. Create Patient emc
-			$patient_medical_info = DB::table('patient_emc')
+			$patient_emc = DB::table('patient_emc')
 				->where('patient_id', $req->patient_id)
 				->delete();
 			//9. Create logs
@@ -453,5 +501,41 @@ class PatientController extends Controller
 			DB::commit();
 			return redirect()->back()->with('msg_error', 'Deleted Patient Failed!');
 		}
+	}
+
+	public function change_status($id)
+	{
+			DB::beginTransaction();
+			try {
+					$patient = Patient::where('patient_id', $id)->first();
+					if($patient->patient_status == 0) {
+						$status = 1;
+					}elseif($patient->patient_status == 1) {
+						$status = 0;
+					}
+
+					Patient::where('patient_id', $id)->update(['patient_status' => $status]);
+
+					$logs_user = DB::table('logs_user')->insert([
+							'user_id' => Auth::user()->user_id,
+							'activity' => 'Update Status Patient ID:' . $id,
+							'logs_detail' => '-',
+							'logs_status' => 'success'
+					]);
+
+					DB::commit();
+					return redirect()->back()->with('msg_success', 'Update Status Patient successfully!');
+			} catch (Exception  $e) {
+					DB::rollback();
+
+					$logs_user = DB::table('logs_user')->insert([
+							'user_id' => Auth::user()->user_id,
+							'activity' => 'Fail! Update Status Patient ID:' . $id,
+							'logs_detail' => 'something is wrong',
+							'logs_status' => 'fail'
+					]);
+					DB::commit();
+					return redirect()->back()->with('msg_error', 'Update Status patient Failed!');
+			}
 	}
 }

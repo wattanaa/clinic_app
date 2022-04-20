@@ -69,6 +69,24 @@
         </ul>
       </li>
 
+      <li class="nav-item course">
+        <a href="{{route('admin.course')}}">
+          <span class="icon">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </span>
+          <span class="text">Course</span>
+        </a>
+      </li>
+
+      <li class="nav-item medicine">
+        <a href="{{route('admin.medicine')}}">
+          <span class="icon">
+          <i class="fa-solid fa-syringe"></i>
+          </span>
+          <span class="text">Medicine</span>
+        </a>
+      </li>
+
       <li class="nav-item doctor">
         <a href="{{route('admin.doctor')}}">
           <span class="icon">
@@ -87,15 +105,6 @@
         </a>
       </li>
 
-      <!-- <li class="nav-item ">
-        <a href="#0" class="collapsed" data-bs-toggle="collapse" data-bs-target="#ddmenu_3" aria-controls="ddmenu_3" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="icon">
-          <i class="fa-solid fa-circle-user"></i>
-          </span>
-          <span class="text">User</span>
-        </a>
-      </li> -->
-
       <li class="nav-item nav-item-has-children user">
         <a href="#!" class="collapsed" data-bs-toggle="collapse" data-bs-target="#menu-item-user">
           <span class="icon">
@@ -112,6 +121,7 @@
           </li>
         </ul>
       </li>
+
 
       <!-- <li class="nav-item ">
         <a href="#0" class="collapsed" data-bs-toggle="collapse" data-bs-target="#ddmenu_3" aria-controls="ddmenu_3" aria-expanded="false" aria-label="Toggle navigation">

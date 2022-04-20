@@ -14,14 +14,24 @@ $(function () {
         search: {
             caseInsensitive: true,
         },
+        columnDefs: [
+            { orderable: false, targets: 1 },
+            { orderable: false, targets: 2 },
+            { orderable: false, targets: 3 },
+            { orderable: false, targets: 4 },
+            { orderable: false, targets: 6 }
+        ],
     });
 
     $("#search_name").on("keyup", function () {
-        datatable.column(2).search(this.value).draw();
+        datatable.column([0,2]).search(this.value).draw();
+    });
+    $("#search_role").on("keyup", function () {
+        datatable.column(4).search(this.value).draw();
     });
     $("#search_status").on("change", function () {
         regex = "\\b" + this.value + "\\b";
-        datatable.column(6).search(regex, true, false).draw();
+        datatable.column(5).search(regex, true, false).draw();
     });
 
     // Model Delete
@@ -38,12 +48,13 @@ $(function () {
         $("#e_user_name").val(_this.find('.user_name').text());
         $("#e_user_email").val(_this.find('.user_email').text());
         $(`#e_user_role option[value=${_this.find('.user_role').text()}]`).prop("selected", true)
-        if(_this.find('.user_status a').text() == ' Abnormal') {
+        if(_this.find('.user_status a').text() == ' Inactive') {
             $("#e_user_status option[value='0']").prop("selected", true)
-        }else if(_this.find('.user_status a').text() == ' Normal') {
+        }else if(_this.find('.user_status a').text() == ' Active') {
             $("#e_user_status option[value='1']").prop("selected", true)
         }
         $("#e_old_image").val(_this.find('.user_image').attr('alt'));
+        $(".image-output").attr('src',_this.find('.user_image').attr('src'));
 
     });
 });

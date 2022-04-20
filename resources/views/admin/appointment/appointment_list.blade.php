@@ -43,10 +43,38 @@
               <form action="" class="mb-4">
                 <div class="row gy-3 gx-2">
 
-                  <div class="col-sm-6 col-md-4">
+                  <div class="col-sm-6 col-md-4 col-xl-3">
                     <div class="input-style-3 mb-0">
                       <input type="text" placeholder="Search Name" class="bg-transparent" id="search_name">
                       <span class="icon"> <i class="fa-solid fa-magnifying-glass me-1"></i></span>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6 col-md-4 col-xl-2">
+                    <div class="form-floating">
+                      <select class="form-select" id="search_status" aria-label="Floating label select example">
+                        <option selected value="">All</option>
+                        <option value="appointment" class="text-warning">Appointment</option>
+                        <option value="arrived" class="" style="color:skyblue">Arrived</option>
+                        <option value="pending" class="" style="color:orange">Pending</option>
+                        <option value="completed" class="text-success">Completed</option>
+                        <option value="cancel" class="text-danger">Cancel</option>
+                      </select>
+                      <label for="search_status"><i class="fa-solid fa-circle-check me-1"></i> Patent Status</label>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6 col-md-4 col-xl-2" style="max-width: 210px;">
+                    <div class="form-floating">
+                      <input type="text" id="min" name="min" class="form-control bg-transparent">
+                      <label for="floatingSelect"><i class="fa-solid fa-clock me-1"></i> Start Date</label>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6 col-md-4 col-xl-2" style="max-width: 210px;">
+                    <div class="form-floating">
+                      <input type="text" id="max" name="max" class="form-control bg-transparent">
+                      <label for="floatingSelect"><i class="fa-solid fa-clock"></i> End Date</label>
                     </div>
                   </div>
 
@@ -92,7 +120,7 @@
                       <td class="text-center"><a href="" class="text-primary appointment_id">{{$appointment->appointment_number}}</a></td>
                       <td class="ps-2 appointment_name">{{$appointment->doctor_title}} {{$appointment->doctor_fname}} {{$appointment->doctor_lname}}</td>
                       <td class="">{{$appointment->patient_title}} {{$appointment->patient_fname}} {{$appointment->patient_lname}}</td>
-                      <td class="appointment_date">{{$appointment->appointment_date}}</td>
+                      <td class="appointment_date">{{\Carbon\Carbon::parse($appointment->appointment_date)->format('d-m-Y')}}</td>
                       <td class="appointment_time">{{$appointment->appointment_time}}</td>
                       <td class="appointment_status">
                         @switch($appointment->appointment_status)
@@ -123,8 +151,8 @@
                           </a>
 
                           <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                            <li><a class="dropdown-item" href="#" data-id="{{$appointment->appointment_id}}"><i class="fa-solid fa-eye"></i> View</a>
-                            <li><a class="dropdown-item" href="#" data-id="{{$appointment->appointment_id}}"><i class="fa-solid fa-print"></i> Print</a>
+                            <li><a class="dropdown-item btn-view" href="#" data-id="{{$appointment->appointment_id}}"><i class="fa-solid fa-eye"></i> View</a>
+                            <li><a class="dropdown-item" href="{{route('admin.appointment.print',$appointment->appointment_id)}}" ><i class="fa-solid fa-print"></i> Print</a>
                             <li><a class="dropdown-item btn-edit" href="#" data-id="{{$appointment->appointment_id}}" data-bs-toggle="modal" data-bs-target="#modal_update"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
                             </li>
                             <li><a class="dropdown-item btn-cancel" href="#" data-id="{{$appointment->appointment_id}}" data-bs-toggle="modal" data-bs-target="#modal_cancel"><i class="fa-solid fa-calendar-xmark"></i> Cancel</a></li>
@@ -214,7 +242,7 @@
                     <select class="light-bg" required="required" name="doctor_id" id="doctor_id" style="width: 100%;">
                       <option disabled selected>Please select doctor</option>
                       @foreach($doctors AS $doctor)
-                      <option value="{{$doctor->doctor_id}}">{{$doctor->title}} {{$doctor->fname}} {{$doctor->lname}}</option>
+                      <option value="{{$doctor->doctor_id}}" {{(old('doctor_id') == $doctor->doctor_id)? 'selected':''}}>{{$doctor->title}} {{$doctor->fname}} {{$doctor->lname}}</option>
                       @endforeach
                     </select>
                     @error('doctor_id')
@@ -235,7 +263,7 @@
                     <select class="light-bg" required="required" name="patient_id" id="patient_id" style="width: 100%;">
                       <option disabled selected>Please select patient</option>
                       @foreach($patients AS $patient)
-                      <option value="{{$patient->patient_id}}">{{$patient->title}} {{$patient->fname}} {{$patient->lname}}</option>
+                      <option value="{{$patient->patient_id}}" {{(old('patient_id') == $patient->patient_id)? 'selected':''}}>[{{$patient->opd_id}}] {{$patient->title}} {{$patient->fname}} {{$patient->lname}}</option>
                       @endforeach
                     </select>
                     @error('patient_id')
@@ -280,7 +308,7 @@
               <div class="col-12">
                 <div class="input-style-1">
                   <label> Reason for Appointment <span class="text-danger">*</span> </label>
-                  <textarea rows="4" cols="30" name="reason_for_appointment" required="required" data-parsley-maxlength="100" class="form-control" placeholder="Please enter your First Name"></textarea>
+                  <textarea rows="4" cols="30" name="reason_for_appointment" required="required" class="form-control" placeholder="Please enter your First Name">{{old('reason_for_appointment')}}</textarea>
                   @error('reason_for_appointment')
                   <small class="text-danger">
                     {{ $message }}
@@ -293,7 +321,7 @@
               <div class="col-12">
                 <div class="input-style-1">
                   <label> Doctor Comment</label>
-                  <textarea rows="4" cols="30" id="doctor_comment" name="doctor_comment" data-parsley-maxlength="100" class="form-control" placeholder="Please enter your First Name"></textarea>
+                  <textarea rows="4" cols="30" id="doctor_comment" name="doctor_comment" class="form-control" placeholder="Please enter your First Name">{{old('doctor_comment')}}</textarea>
                   @error('doctor_comment')
                   <small class="text-danger">
                     {{ $message }}
@@ -392,7 +420,7 @@
               <div class="col-sm-6">
                 <div class="input-style-1">
                   <label><i class="fa-solid fa-calendar-days"></i> Date <span class="text-danger">*</span> </label>
-                  <input type="date" required="required" class="e_appointment_date" id="e_appointment_date" name="appointment_date" value="{{old('appointment_date')}}">
+                  <input type="date" required="required" class="e_appointment_date" id="e_appointment_date" name="appointment_date" value="">
                   @error('appointment_date')
                   <small class="text-danger">
                     {{ $message }}
@@ -406,7 +434,7 @@
               <div class="col-sm-6">
                 <div class="input-style-1">
                   <label><i class="fa-solid fa-clock"></i> Time <span class="text-danger">*</span> </label>
-                  <input type="date" required="required" class="e_appointment_time" id="e_appointment_time" name="appointment_time" value="{{old('appointment_time')}}">
+                  <input type="date" required="required" class="e_appointment_time" id="e_appointment_time" name="appointment_time" value="">
                   @error('appointment_time')
                   <small class="text-danger">
                     {{ $message }}
@@ -432,7 +460,7 @@
               <div class="col-12">
                 <div class="input-style-1">
                   <label> Doctor Comment</label>
-                  <textarea rows="4" cols="30" id="doctor_comment" name="doctor_comment" class="form-control e_doctor_comment" placeholder="Please enter your First Name"></textarea>
+                  <textarea rows="4" cols="30" id="e_doctor_comment" name="doctor_comment" class="form-control e_doctor_comment" placeholder="Please enter your First Name"></textarea>
                   @error('doctor_comment')
                   <small class="text-danger">
                     {{ $message }}
@@ -486,6 +514,66 @@
   </div>
 </div>
 
+<!-- Modal View-->
+<div class="follow-up-modal">
+  <div class="modal fade" id="modal_detail" aria-labelledby="modal_detailLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content card-style">
+        <div class="modal-header px-0 border-0">
+          <h3 class="text-bold"><i class="fa-solid fa-clipboard-list"></i> Appointment Details</h3>
+          <button class="border-0 bg-transparent h1" data-bs-dismiss="modal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <hr class="m-0">
+        <div class="modal-body" style="font-family: Arial, Helvetica, sans-serif;">
+          <div class="head-top d-flex flex-wrap flex-lg-nowrap">
+            <div class="logo me-4 mt-2">
+              <img src="{{asset('image/LogoBeautyCare.png')}}" alt="" width="220">
+            </div>
+            <div class="clinic-info mt-2 w-100">
+              <h4>คลินิคเสริมความงาม บิวตี้แคร์</h4>
+              <h5>Beauty Care Clinic</h5>
+              <p>โครงการตลาดจอมพล Overflow เลขที่ 555/49 ถนนกสิกรทุ่งสร้าง ตำบลในเมือง อำเภอเมืองขอนแก่น จังหวัดขอนแก่น 40000 โทร 064-487-0915</p>
+              <hr class="my-2">
+            </div>
+          </div>
+
+          <div class="head">
+            <h3 class="text-center mb-3">บัตรนัด</h3>
+          </div>
+
+          <div class="body" style="font-size: 18px;">
+            <div class="row justify-content-between">
+              <div class="col-sm-6 col-lg-5">
+                <span class="fw-bold my-1">ชื่อ-นามสกุล : </span> <span class="show_patient_name"></span> <br>
+                <span class="fw-bold my-1">รหัส : </span> <span class="show_patient_opd"></span> <br>
+                <span class="fw-bold my-1">อายุ : </span> <span class="show_patient_age"></span> <br>
+                <span class="fw-bold my-1">เบอร์โทร : </span> <span class="show_patient_phone"></span> <br>
+                <span class="fw-bold my-1">โรคประจำตัว : </span> <span class="show_patient_congenital_disease"></span> <br>
+                <span class="fw-bold my-1">แพ้ยา : </span> <span class="show_patient_drug_allergies"></span> <br>
+              </div>
+              <div class="col-sm-6 col-lg-5">
+                <span class="fw-bold my-1">ใบนัดหมายเลข : </span> <span class="show_appointment_number">></span> <br>
+                <span class="fw-bold my-1">วันที่นัด : </span> <span class="show_appointment_date"></span> <br>
+                <span class="fw-bold my-1">เวลาที่นัด : </span> <span class="show_appointment_time"></span> <br>
+                <span class="fw-bold my-1">แพทย์ผู้นัด : </span> <span class="show_doctor_name"></span> <br>
+                <span class="fw-bold my-1">ติดต่อ : </span> <span> 064-487-0915</span> <br>
+              </div>
+            </div>
+
+            <p class="mt-4 fs-5 fw-bold">สาเหตุที่นัด : <span class="show_reason_for_appointment fw-light"> -</span></p>
+
+            <p class="mt-4 fs-5 fw-bold">หมายเหตุ : <span class="show_doctor_comment"> -</span></p>
+
+            <p class="text-end mt-4">ออกใบนัดวันที่ : <span class="show_created_at"></span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 @endsection
 @section('script')
@@ -494,6 +582,7 @@
 <script src="{{ asset('js/flatpickr/dist/flatpickr.min.js') }}"></script>
 <script src="{{ asset('js/cleave.js/dist/cleave.min.js') }}"></script>
 <script src="{{ asset('js/ckeditor5/build/ckeditor.js') }}"></script>
+<script src="{{ asset('js/parsleyjs/dist/parsley.min.js') }}"></script>
 <script src="{{ asset('js/select2/dist/js/select2.min.js') }}"></script>
 <script src="{{ asset('js/admin/appointment/appointment.js') }}"></script>
 @endsection

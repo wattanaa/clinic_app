@@ -44,6 +44,32 @@
                     </div>
                   </div>
 
+                  
+                  <div class="col-sm-6 col-md-4 col-xl-2">
+                    <div class="form-floating">
+                      <select class="form-select" id="search_status" aria-label="Floating label select example">
+                        <option selected value="">All</option>
+                        <option value="success" class="text-success">Success</option>
+                        <option value="fail" class="text-danger">Fail!</option>
+                      </select>
+                      <label for="search_status"><i class="fa-solid fa-circle-check me-1"></i> Patent Status</label>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6 col-md-4 col-xl-2" style="max-width: 210px;">
+                    <div class="form-floating">
+                      <input type="text" id="min" name="min" class="form-control bg-transparent">
+                      <label for="floatingSelect"><i class="fa-solid fa-clock me-1"></i> Start Date</label>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6 col-md-4 col-xl-2" style="max-width: 210px;">
+                    <div class="form-floating">
+                      <input type="text" id="max" name="max" class="form-control bg-transparent">
+                      <label for="floatingSelect"><i class="fa-solid fa-clock"></i> End Date</label>
+                    </div>
+                  </div>
+
                 </div>
               </form>
 
@@ -55,7 +81,7 @@
                       <th class="text-center rounded-0" style="width: 5%;">
                         <h6 class="text-white">ID.</h6>
                       </th>
-                      <th style="width: 10%;">
+                      <th style="width: 15%;">
                         <h6 class="text-white">Author</h6>
                       </th>
                       <th>
@@ -81,7 +107,7 @@
                       <td class="ps-2 ">{{$log->activity}}</td>
                       <td class="">{{$log->logs_detail}}</td>
                       <td class="">{{$log->logs_status}}</td>
-                      <td class="">{{$log->active_date}}</td>
+                      <td class="">{{\Carbon\Carbon::parse($log->active_date)->format('d-m-Y H:i')}}</td>
                     </tr>
                     @endforeach
                     <!-- ========== header end ========== -->
@@ -156,7 +182,7 @@
               <div class="col-sm-6">
                 <div class="input-style-1">
                   <label> Name <span class="text-danger">*</span> </label>
-                  <input type="text" value="{{old('name')}}" name="name" required="required" data-parsley-maxlength="100" class="form-control" placeholder="Please enter your First Name" autocomplete="off">
+                  <input type="text" value="{{old('name')}}" name="name" required="required" data-parsley-maxlength="100" class="form-control" placeholder="Please enter First Name" autocomplete="off">
                   @error('name')
                   <small class="text-danger">
                     {{ $message }}
@@ -170,7 +196,7 @@
               <div class="col-sm-6">
                 <div class="input-style-1">
                   <label>Email <span class="text-danger">*</span></label>
-                  <input type="email" value="" placeholder="Please enter your Email" name="email" data-parsley-trigger="change" data-parsley-maxlength="255" class="form-control" autocomplete="off">
+                  <input type="email" value="{{old('email')}}" placeholder="Please enter Email" name="email" data-parsley-trigger="change" data-parsley-maxlength="255" class="form-control" autocomplete="off">
                   @error('email')
                   <small class="text-danger">
                     {{ $message }}
@@ -183,7 +209,7 @@
               <div class="col-sm-6">
                 <div class="input-style-1">
                   <label>Password <span class="text-danger">*</span> </label>
-                  <input type="password" value="" name="password" data-parsley-maxlength="255" class="form-control" placeholder="Please enter user Password" autocomplete="off">
+                  <input type="password" value="{{old('password')}}" name="password" data-parsley-maxlength="255" class="form-control" placeholder="Please enter Password" autocomplete="off">
                   @error('password')
                   <small class="text-danger">
                     {{ $message }}
@@ -198,10 +224,10 @@
                   <label>Employee Role <span class="text-danger">*</span> </label>
                   <div class="select-position">
                     <select class="light-bg" required="required" name="role" id="role_select" style="width: 100%;">
-                      <option value="admin">admin/employee</option>
-                      <option value="doctor">doctor</option>
-                      <option value="manager">manager</option>
-                      <option value="user">user</option>
+                      <option value="admin" {{(old('role') == 'admin')?'selected':''}}>admin/employee</option>
+                      <option value="doctor" {{(old('role') == 'doctor')?'selected':''}}>doctor</option>
+                      <option value="manager" {{(old('role') == 'manager')?'selected':''}}>manager</option>
+                      <option value="user" {{(old('role') == 'user')?'selected':''}}>user</option>
                     </select>
                     @error('role')
                     <small class="text-danger">
@@ -318,24 +344,24 @@
               </div>
               <!-- end col -->
 
-              
+
               <div class="col-sm-6 col-md-3">
-                        <div class="select-style-1">
-                          <label><i class="fa-solid fa-clipboard-check"></i> User Status </label>
-                          <div class="select-position">
-                            <select class="light-bg text-capitalize" name="user_status" id="e_user_status">
-                              <option class="text-capitalize" value="1">Normal</option>
-                              <option class="text-capitalize" value="0">Abnormal</option>
-                            </select>
-                            @error('user_status')
-                            <small class="text-danger">
-                              {{ $message }}
-                            </small>
-                            @enderror
-                          </div>
-                        </div>
-                      </div>
-                      <!-- end col -->
+                <div class="select-style-1">
+                  <label><i class="fa-solid fa-clipboard-check"></i> User Status </label>
+                  <div class="select-position">
+                    <select class="light-bg text-capitalize" name="user_status" id="e_user_status">
+                      <option class="text-capitalize" value="0">Active</option>
+                      <option class="text-capitalize" value="0">Inactive</option>
+                    </select>
+                    @error('user_status')
+                    <small class="text-danger">
+                      {{ $message }}
+                    </small>
+                    @enderror
+                  </div>
+                </div>
+              </div>
+              <!-- end col -->
 
               <div class="col-12">
                 <p><i class="fa-solid fa-image"></i> Image profile</p>
@@ -358,12 +384,16 @@
             </div>
             <div class="action d-flex flex-wrap justify-content-start mt-4">
               <div class="button-group d-flex flex-wrap align-items-end">
-                <a href="#" class="main-btn danger-btn p-2 mx-2 mb-3" data-bs-dismiss="modal">
-                  <i class="fa-solid fa-xmark"></i> Cancel
-                </a>
-                <button type="submit" class="main-btn primary-btn btn-hover mx-2 mb-3">
-                  <i class="fa-solid fa-floppy-disk"></i> Save Change
-                </button>
+                <div class="left">
+                  <a href="#" class="main-btn danger-btn p-2 mx-2 mb-3" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-xmark"></i> Cancel
+                  </a>
+                </div>
+                <div class="right">
+                  <button type="submit" class="main-btn primary-btn btn-hover mx-2 mb-3">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Change
+                  </button>
+                </div>
               </div>
             </div>
           </div>

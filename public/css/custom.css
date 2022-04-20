@@ -14,11 +14,11 @@ body { font-family: sans-serif; }
 }
 li{
   font-size: 16px;
-  font-weight: 300 !important;  
+  font-weight: 400 !important;  
 }
 .dropdown-menu ul li{
   font-size: 16px;
-  font-weight: 300 !important;
+  font-weight: 400 !important;
 }
 
 * { box-sizing: border-box; }
@@ -40,6 +40,15 @@ li{
 .card-body a{
   text-decoration: none;
   color: #000;
+}
+.card img:hover{
+  transform: scale(1.1);
+  transition: .5s;
+  cursor: pointer;
+}
+.card img{
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  transition: .5s;
 }
 .bg-while{
   background: #fff;

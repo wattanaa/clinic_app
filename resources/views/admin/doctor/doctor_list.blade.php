@@ -47,19 +47,25 @@
                     </div>
                   </div>
 
-                  <!-- <div class="col-sm-6 col-md-3">
-                    <div class="form-floating">
-                      <select class="form-select" id="search_group" aria-label="Floating label select example">
-                        <option selected value="">All</option>
-                        <option value="vip">VIP</option>
-                        <option value="vip 2">VIP 2</option>
-                        <option value="old member">Old Member</option>
-                        <option value="normal">Normal</option>
-                        <option value="new member">New Member</option>
-                      </select>
-                      <label for="search_group"><i class="fa-solid fa-elevator me-1"></i> Member Group</label>
+                  <div class="col-sm-6 col-md-4 col-xl-2">
+                    <div class="input-style-3 mb-0">
+                      <input type="text" placeholder="Search Position" class="bg-transparent" id="search_position">
+                      <span class="icon"> <i class="fa-solid fa-users-rectangle me-1"></i></i></span>
                     </div>
-                  </div> -->
+                  </div>
+
+                  
+                  <div class="col-sm-6 col-md-4 col-xl-2">
+                    <div class="form-floating">
+                      <select class="form-select" id="search_status" aria-label="Floating label select example">
+                        <option selected value="">All</option>
+                        <option value="active" class="text-success">Active</option>
+                        <option value="Inactive" class="text-danger">Inactive</option>
+                      </select>
+                      <label for="search_status"><i class="fa-solid fa-circle-check me-1"></i> Patent Status</label>
+                    </div>
+                  </div>
+
 
                 </div>
               </form>
@@ -98,9 +104,9 @@
                   </thead>
                   <tbody>
                     @foreach($doctors as $doctor)
-                    <tr>
+                    <tr class="{{($doctor->doctor_status == 0)?'table-danger':''}}">
                       <td class="text-center"><a href="{{route('admin.doctor.detail',$doctor->doctor_id)}}" class="text-primary">{{$doctor->doctor_id}}</a></td>
-                      <td class="text-center"><img src="{{url('image/uploads/',$doctor->image)}}" class="img-fluid" alt=""></td>
+                      <td class="text-center"><img src="{{url('image/uploads/',$doctor->image)}}" class="" alt="" style="max-height: 100px;object-fit:cover;"></td>
                       <td class="ps-2">{{$doctor->title}} {{$doctor->fname}} {{$doctor->lname}}</td>
                       <td>
                       {{$doctor->phone}}
@@ -109,9 +115,9 @@
                       <td>{{$doctor->position}}</td>
                       <td>
                         @if($doctor->doctor_status == 1)
-                        <a href="#!" class="label-icon success rounded-pill text-capitalize"><i class="fa-solid fa-check"></i> Normal</a>
+                        <a href="{{route('admin.doctor.change_status',$doctor->doctor_id)}}" class="label-icon success rounded-pill text-capitalize"><i class="fa-solid fa-check"></i> Active</a>
                         @else
-                        <a href="#!" class="label-icon red rounded-pill text-capitalize"><i class="fa-solid fa-xmark"></i> Abnormal</a>
+                        <a href="{{route('admin.doctor.change_status',$doctor->doctor_id)}}" class="label-icon red rounded-pill text-capitalize"><i class="fa-solid fa-xmark"></i> Inactive</a>
                         @endif
                       </td>
                       <td class="text-center">
