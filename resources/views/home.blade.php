@@ -5,50 +5,6 @@
 @include('components.navbar')
 <!-- Header -->
 <header id="header" class="header">
-<<<<<<< HEAD
-	<img class="decoration-star" src="https://technext.github.io/yavin/images/decoration-star.svg" alt="alternative">
-	<img class="decoration-star-2" src="https://technext.github.io/yavin/images/decoration-star.svg" alt="alternative">
-	<div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
-		<div class="carousel-indicators">
-			<button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-			<button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-			<button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
-		</div>
-		<div class="carousel-inner">
-			<div class="carousel-item active">
-				<img src="{{asset('image/Slide/1.png')}}" class="d-block w-100" alt="...">
-				<div class="carousel-caption d-none d-md-block">
-					<h5>First slide label</h5>
-					<p>Some representative placeholder content for the first slide.</p>
-				</div>
-			</div>
-			<div class="carousel-item">
-				<img src="{{asset('image/Slide/2.png')}}" class="d-block w-100" alt="...">
-				<div class="carousel-caption d-none d-md-block">
-					<h5>Second slide label</h5>
-					<p>Some representative placeholder content for the second slide.</p>
-				</div>
-			</div>
-			<div class="carousel-item">
-				<img src="{{asset('image/Slide/3.png')}}" class="d-block w-100" alt="...">
-				<div class="carousel-caption d-none d-md-block">
-					<h5>Third slide label</h5>
-					<p>Some representative placeholder content for the third slide.</p>
-				</div>
-			</div>
-		</div>
-		<button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-			<span class="carousel-control-prev-icon" aria-hidden="true"></span>
-			<span class="visually-hidden">Previous</span>
-		</button>
-		<button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-			<span class="carousel-control-next-icon" aria-hidden="true"></span>
-			<span class="visually-hidden">Next</span>
-		</button>
-	</div>
-</header>
-<!-- Content -->
-=======
 	<img class="decoration-star" src="{{asset('image/decoration-star.svg')}}" alt="alternative">
 	<img class="decoration-star-2" src="{{asset('image/decoration-star.svg')}}" alt="alternative">
 	<div class="container">
@@ -71,7 +27,6 @@
 	</div> <!-- end of container -->
 </header> <!-- end of header -->
 <!-- end of header -->
->>>>>>> ec00e84c048dd43b6fa88b43455dfe5d324b890b
 
 
 <!-- Statistics -->
